@@ -19,13 +19,15 @@ def login_required(admin_required = False):
 
     return decorator
 
+def hour_converter(stri):
+    return datetime.strptime(stri, "%H:%M")
 
 def datetime_converter(stri):
-    return datetime.strptime(stri, "%Y-%m-%d")
+    return datetime.strptime(stri, "%Y-%m-%dT%H:%M")
 
 
 def str_converter(datet):
-    return datetime.strftime(datet, "%Y-%m-%d")
+    return datetime.strftime(datet,"%Y-%m-%dT%H:%M")
 
 
 def get_instance_from_module_path(module_p):

@@ -1,29 +1,22 @@
 <!doctype html>
 <html lang="en">
-<head>
-    {% block head %}
+    <head>
+        {% block head %}
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport"
               content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-{#              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"#}
-              crossorigin="anonymous">
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/fontawesome.min.css') }}"
-{#              integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"#}
-              crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}" crossorigin="anonymous">
 
         <title>{% block title %}{% endblock %} - Superform</title>
-
         {% endblock %}
     </head>
-    
+
     <body>
-    
+
 
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="{{ url_for('index') }}">
@@ -33,7 +26,7 @@
             <a class="navbar-brand" href="{{ url_for('rss_explorer.feed_list') }}">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Generic_Feed-icon.svg" width="40" height="40" alt="rss">
             </a>
-            <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="true" data-use-continue-as="true" onlogin=startConnexion()></div>
+            <fb:login-button size="xlarge" scope="email, manage_pages, pages_show_list, publish_pages, business_management, publish_to_groups, public_profile" onlogin="checkLoginState();">Refresh Token</fb:login-button>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -46,7 +39,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('posts.new_post')}}">New post</a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('stats.stats')}}">Stats</a>
+                        </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('posts.records')}}">Archives</a>
@@ -73,7 +69,7 @@
                 </ul>
             </div>
         </nav>
-        
+
         <div class="container-fluid">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -92,7 +88,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        
+
         <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"
               {#    integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" #}
                 crossorigin="anonymous"></script>

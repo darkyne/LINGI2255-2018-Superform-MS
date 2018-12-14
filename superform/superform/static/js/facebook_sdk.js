@@ -1,5 +1,17 @@
-            
+ 
+    
     // This is called with the results from from FB.getLoginStatus().
+    var credentials = "";
+    function requestPermissionsForPage(callback){
+        FB.api (
+            "/me/accounts",
+            function (response) {
+                if(response && !response.error){
+                    callback(response);
+                }  
+            }
+        ), {Scope: "manage_pages"};
+    } 
     function statusChangeCallback(response) {
         console.log('statusChangeCallback');
         console.log(response);
@@ -9,7 +21,19 @@
         // for FB.getLoginStatus().
         if (response.status === 'connected') {
         // Logged into your app and Facebook.
-        testAPI();
+            requestPermissionsForPage(function(res){
+                credentials = res;
+                console.log("credentials are : ");
+                console.log(credentials)
+                $.ajax({
+                    type: "POST",
+                    contentType:"application/json;charset=utf-8",
+                    url:"/facebook_credentials",
+                    data: JSON.stringify({credentials}),
+                    dataType: "json",
+                });
+                
+            });
         } else {
             console.log('passe dans le else')
         // The person is not logged into your app or we are unable to tell.
@@ -61,7 +85,6 @@
 
     // Load the SDK asynchronously
     (function(d, s, id) {
-        console.log("tessssst, passe mnt")
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
         js = d.createElement(s); js.id = id;
@@ -71,65 +94,7 @@
 
     // Here we run a very simple test of the Graph API after login is
     // successful.  See statusChangeCallback() for when this call is made.
-    function testAPI() {
-        console.log('Welcome!  Fetching your information.... ');
-        FB.api('/me', function(response) {
-        console.log('Successful login for: ' + response.name);
-        document.getElementById('status').innerHTML =
-            'Thanks for logging in, ' + response.name + '!';
-            
-        });
-        
-    }
-    function loginWithPermissions(){
-        
-    }
-    function requestPermissionsForPage(callback){
-        FB.api (
-            "/me/accounts",
-            function (response) {
-                console.log("DEVANT LE IIIIIIFFFF")
-                console.log(response);
-                
-                if(response && !response.error){
-                    console.log("DAAAANS APIIIIII")
-                    console.log (response);
-                    callback(response);
-                }
-                
-                
-                
-            }
-        ), {Scope: "manage_pages"};
-    }
+    
+    
 
-    var credentials = "";
-    function startConnexion(){
-                FB.login(function(response) {
-                    console.log("in loginWithPermissions()");
-                    console.log(response);
-                }, {
-                    scope: 'email, manage_pages, pages_show_list, publish_pages, business_management, publish_to_groups, public_profile', 
-                    return_scopes: true
-                });
-                FB.getLoginStatus (function (response) {
-                    if(response.status === 'connected'){
-                        console.log("DAAAANS GET LOOOOGIIIIN")
-
-                        console.log (response);
-                    }
-                });
-                requestPermissionsForPage(function(res){
-                    credentials = res;
-                    console.log("credentials are : ");
-                    console.log(credentials)
-                    $.ajax({
-                        type: "POST",
-                        contentType:"application/json;charset=utf-8",
-                        url:"/facebook_credentials",
-                        data: JSON.stringify({credentials}),
-                        dataType: "json",
-                    });
-                     
-                });    
-        };
+           

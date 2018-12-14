@@ -16,15 +16,15 @@ class User(db.Model):
     name = db.Column(db.String(120), nullable=False)
     first_name = db.Column(db.String(120), nullable=False)
     admin = db.Column(db.Boolean, default=False)
-    fb_cred = db.Column(db.String(2147483647), nullable=True) # NOTRE CHAMP
+    fb_cred = db.Column(db.String(2147483647), nullable=True) # Parce que c'est NOTRE CHAMP
+    gcal_cred = db.Column(db.String(2147483647), nullable=True)
     posts = db.relationship("Post", backref="user", lazy=True)
     authorizations = db.relationship("Authorization", backref="user", lazy=True)
 
-
     def __repr__(self):
         return '<User {}>'.format(repr(self.id))
-    
-    
+
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key = True, unique = True,
@@ -60,11 +60,12 @@ class Post(db.Model):
 
 
 class Publishing(db.Model):
-    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable = False)
-    channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"),
-                           nullable = False)
-    state = db.Column(db.Integer, nullable = False, default = -1)
-    title = db.Column(db.Text, nullable = False)
+
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False)
+    user_id = db.Column(db.String(80), db.ForeignKey("user.id"), nullable=False)
+    channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
+    state = db.Column(db.Integer, nullable=False, default=-1)
+    title = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     link_url = db.Column(db.Text)
     image_url = db.Column(db.Text)
@@ -82,11 +83,12 @@ class Publishing(db.Model):
 
 
 class Channel(db.Model):
-    id = db.Column(db.Integer, primary_key = True, unique = True,
-                   nullable = False)
-    name = db.Column(db.Text, nullable = False)
-    module = db.Column(db.String(100), nullable = False)
-    config = db.Column(db.Text, nullable = False)
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    module = db.Column(db.String(100), nullable=False)
+    config = db.Column(db.Text, nullable=False)
+    count = db.Column(db.Integer, default=0)
 
     publishings = db.relationship("Publishing", cascade="all, delete-orphan", backref = "channel",
                                   lazy = True)
@@ -121,3 +123,4 @@ class Permission(Enum):
 class State(Enum):
     WAITING = 1
     PUBLISHED = 2
+    ARCHIVED = 3

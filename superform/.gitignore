@@ -1,0 +1,15 @@
+# Created by .ignore support plugin (hsz.mobi)
+/venv/
+.idea
+/__pycache__/
+**/__pycache__/
+config.json
+credentials.json
+.cache/*
+.pytest_cache/*
+/superform/.cache/*
+/superform/.pytest_cache/*
+.DS_Store
+superform.db
+/superform/rootCA.pem
+/superform/rootCA.key

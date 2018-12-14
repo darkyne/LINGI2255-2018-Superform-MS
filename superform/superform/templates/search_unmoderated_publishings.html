@@ -1,0 +1,171 @@
+<form class="form-group">
+     <label for="subject-search"><b>Search by subject :</b></label>
+     <input type="text" class="form-control" id="subject-search" placeholder="...">
+</form>
+<div class="input-group-btn">
+      <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#advanced-search-unmoderated-publishings" aria-expanded="true">Advanced search &gt;&gt;</button>
+</div>
+<div id ="advanced-search-unmoderated-publishings" class="collapse">
+<form class="form-group" action="search">
+     <label for="body-search"><b> Text contains in body : </b></label>
+     <input type="text" class="form-control" id="body-search" placeholder="...">
+</form>
+<form class="form-group">
+     <label for="author-search"><b> Author : </b></label>
+     <input type="text" class="form-control" id="author-search" placeholder="...">
+</form>
+<div class="form-group">
+     <label for="channel-search"><b>Channels : </b></label>
+                             {% if channels|length == 0 %}
+                                 <p>No channel available for this user</p>
+                             {% else %}
+                                 {% for chan in channels %}
+                                     <div class="form-check">
+                                      <label class="form-check-label">
+                                        <input id ="checkbox-search {{chan.id}}" type="checkbox" class="form-check-input checkbox" checked>{{ chan.name }}
+                                      </label>
+                                    </div>
+                                 {% endfor %}
+                             {% endif %}
+</div>
+</div>
+<br/>
+
+<script>
+     var allChannels = {% if channels|length == 0 %}[]{% else %}[{% for chan in channels %}'{{chan.id}}',{% endfor %}]{% endif %}
+     var nbRequestSearchPublishings = 0;
+     var filterPublishings = {
+          channels : allChannels,
+          subject : "",
+          body : "",
+          author : ""
+     };
+
+     function waitJQuery(func, args) {
+    if (window.jQuery)
+         func(args);
+    else
+        setTimeout(function() {
+            waitJQuery(func, args)
+        }, 40);
+     }
+
+     function launchListenerPublishings() {
+          $("#search_unmoderated").find("#subject-search" ).on('input', function() {
+               filterPublishings.subject = $(this).val();
+               nbRequestSearchPublishings += 1;
+
+          });
+          $("#search_unmoderated").find( "#body-search" ).on('input', function() {
+               filterPublishings.body = $(this).val();
+               nbRequestSearchPublishings += 1;
+          });
+
+           $("#search_unmoderated").find( "#author-search" ).on('input', function() {
+               filterPublishings.author = $(this).val();
+               nbRequestSearchPublishings += 1;
+          });
+
+         $("#search_unmoderated").find('input.checkbox').change(function () {
+            tbId = $(this).attr("id").split(' ');
+            checked = $(this).is(":checked")
+            if (tbId[0] == "checkbox-search") {
+                if (checked && !isInArray(filterPublishings.channels, tbId[1])) {
+                    filterPublishings.channels.push(tbId[1]);
+                    nbRequestSearchPublishings += 1;
+                }
+                else if (!checked && isInArray(filterPublishings.channels, tbId[1])){
+                    filterPublishings.channels = removeFromArray(filterPublishings.channels, tbId[1]);
+                    nbRequestSearchPublishings += 1;
+                }
+            }
+        });
+     }
+
+     function launchSearchPublishings(){
+        if (nbRequestSearchPublishings > 1) {
+            nbRequestSearchPublishings -= 1;
+        }
+        else if (nbRequestSearchPublishings == 1) {
+            nbRequestSearchPublishings -= 1
+            searchPublishings();
+         }
+         if (nbRequestSearchPublishings > 10) {
+            nbRequestSearchPublishings = 0;
+            searchPublishings();
+         }
+         setTimeout(function() { launchSearchPublishings()}, 250);
+     }
+
+     function searchPublishings() {
+      $.ajax({
+                    type : 'POST',
+                    data : filterPublishings,
+                    url : '/search_publishings',
+                    dataType : 'json',
+                    success : function(data) {
+                        console.log(filterPublishings);
+                        //console.table(JSON.parse(data));
+                        $("tbody.list-publishings").html(changeTablePublishings(data));
+                        formattingTableForTwitter();
+                    }
+      });
+     }
+
+     function changeTablePublishings(data) {
+        html = ''
+        if (data.length == 0) {
+            html = "<b>Nothing found !</b>"
+        }
+        else {
+            data.forEach(function(row) {
+                html += '<tr>'
+                html += '<td>' + row['channel'] + '</td>'
+                html += '<td>' + row['subject'] + '</td>'
+                html += '<td><div class="row"><div class="col">'
+                body = row['body'].substring(1, row['body'].length - 1).split(',') //String to array
+                body.forEach(function(item) {
+                    html += item.substring(1, item.length - 1);
+                    html += '\n';
+                });
+                html += '</div></div></td>'
+                html += '<td>' + row['author'] + '</td>'
+                html += '<td><a href="'+row['button']+'" class="btn btn-outline-primary" role="button">Moderate</a></td>'
+                html += '</tr>'
+            });
+        }
+        return html;
+     }
+
+     function formattingTableForTwitter() {
+        $(".col").each(function() {
+            text = $(this).html();
+            if (text.search("tweet-separator") > -1 )
+                text = "<ul>"+text+"</ul>";
+            while (text.search("tweet-separator") > -1 )
+                text = text.replace("tweet-separator","li");
+            $(this).html(text);
+        });
+     }
+
+     function removeFromArray(tb, value) {
+        var tb2 = new Array()
+        tb.forEach(function(item, index) {
+            if (item != value)
+                tb2.push(item);
+        });
+        return tb2;
+    }
+    function isInArray(tb, value) {
+        var isIn = false;
+        tb.forEach(function(item, index) {
+            if (item.localeCompare(value) == 0)
+                isIn = true;
+        });
+        return isIn;
+    }
+
+     launchSearchPublishings();
+     waitJQuery(launchListenerPublishings);
+     nbRequestSearchPublishings += 1;
+</script>

@@ -1,0 +1,135 @@
+<form class="form-group">
+     <label for="subject-search"><b>Search by subject :</b></label>
+     <input type="text" class="form-control" id="subject-search" placeholder="...">
+</form>
+<div class="input-group-btn">
+      <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#advanced-search-post" aria-expanded="true">Advanced search &gt;&gt;</button>
+</div>
+<div id ="advanced-search-post" class="collapse">
+<form class="form-group">
+     <label for="body-search"><b> Text contains in body : </b></label>
+     <input type="text" class="form-control" id="body-search" placeholder="...">
+</form>
+    <div class="form-group">
+        <label for="sorted-search">Sort by:</label>
+        <select class="form-control" id="sorted-search">
+        <option id="id">Id ('#')</option>
+        <option id="title">Subject</option>
+        <option id="description">Body</option>
+  </select>
+</div>
+
+</div>
+<br/>
+
+<script>
+     var nbRequestSearchPost = 0;
+     var filterPosts = {
+          subject : "",
+          body : "",
+          sorted : "id"
+     };
+
+     function waitJQuery(func, args) {
+    if (window.jQuery)
+         func(args);
+    else
+        setTimeout(function() {
+            waitJQuery(func, args)
+        }, 40);
+     }
+
+     function launchListenerPost() {
+          $("#search_post").find("#subject-search" ).on('input', function() {
+
+               filterPosts.subject = $(this).val();
+               nbRequestSearchPost += 1;
+
+          });
+          $("#search_post").find( "#body-search" ).on('input', function() {
+               filterPosts.body = $(this).val();
+               nbRequestSearchPost += 1;
+          });
+
+           $("#search_post").find( "#sorted-search" ).on('change', function() {
+               filterPosts.sorted = $(this).children(":selected").attr("id");
+               nbRequestSearchPost += 1;
+          });
+     }
+
+     function launchSearchPost(){
+        if (nbRequestSearchPost > 1) {
+            nbRequestSearchPost -= 1;
+        }
+        else if (nbRequestSearchPost == 1) {
+            nbRequestSearchPost -= 1
+            searchPost();
+         }
+         if (nbRequestSearchPost > 10) {
+            nbRequestSearchPost = 0;
+            searchPost();
+         }
+         setTimeout(function() { launchSearchPost()}, 250);
+     }
+
+     function searchPost() {
+      $.ajax({
+                    type : 'POST',
+                    data : filterPosts,
+                    url : '/search_post',
+                    dataType : 'json',
+                    success : function(data) {
+                        console.log(data);
+                        $("tbody.list-posts").html(changeTablePost(data));
+                    }
+      });
+     }
+
+     function changeTablePost(data) {
+        html = ''
+        if (data.length == 0) {
+            html = "<b>Nothing found !</b>"
+        }
+        else {
+            data.forEach(function(row) {
+                html += '<tr>'
+                html += '<td>' + row['id'] + '</td>'
+                html += '<td>' + row['title'] + '</td>'
+                html += '<td><div class="row"><div class="col">'
+                body = row['description'].substring(1, row['description'].length - 1).split(',') //String to array
+                body.forEach(function(item) {
+                    html += item.substring(1, item.length - 1);
+                    html += '\n';
+                });
+                html += '</div></div></td>'
+                html += '<td>'
+                html += '<a href="'+row['hrefEdit']+'" class="btn btn-outline-primary" role="button">Edit</a>'
+                html += '<a href="'+row['hrefCopy']+'" class="btn btn-outline-primary" role="button">Copy</a>'
+                html += '<a href="'+row['hrefDelete']+'" class="btn btn-outline-warning" role="button">Delete</a>'
+                html += '<button type="button" class="btn btn-info" data-toggle="modal" data-target="#exportModal" data-id="'+row['hrefExportPdf']+'"><i class="fas fa-fw fa-file-pdf"></i> Export</button>'
+                html += '</td> </tr>'
+            });
+        }
+        return html
+     }
+
+     function removeFromArray(tb, value) {
+        var tb2 = new Array();
+        tb.forEach(function(item, index) {
+            if (item != value)
+                tb2.push(item);
+        });
+        return tb2;
+    }
+    function isInArray(tb, value) {
+        var isIn = false;
+        tb.forEach(function(item, index) {
+            if (item.localeCompare(value) == 0)
+                isIn = true;
+        });
+        return isIn;
+    }
+
+     launchSearchPost();
+     waitJQuery(launchListenerPost);
+</script>

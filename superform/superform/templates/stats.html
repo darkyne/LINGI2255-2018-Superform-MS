@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% block title %}New Post{% endblock %}
+{% block content %}
+
+<h1> Statistics</h1>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+
+<h2> Your personnal statistics </h2>
+<div class="row">
+
+    <div class="col-md-4 offset-md-1">
+        <h3>Channel use</h3>
+        <canvas id="publishing_chart" width="400" height="400"></canvas>
+    </div>
+</div>
+{% if data.user.is_mod %}
+<h2> Global site statistics </h2>
+
+<div class="row">
+    <div class="col-md-4 offset-md-1">
+        <h3>Channel use</h3>
+        <canvas id="channel_chart" width="400" height="400"></canvas>
+    </div>
+    <div class="col-md-4 offset-md-1">
+        <h3>Number of accepted publications</h3>
+        <canvas id="accepted_chart" width="400" height="400"></canvas>
+    </div>
+    <div class="col-md-4 offset-md-1">
+        <h3>Number of pending publications</h3>
+        <canvas id="waiting_chart" width="400" height="400"></canvas>
+    </div>
+    <div class="col-md-4 offset-md-1">
+        <h3>Total number of posts</h3>
+        <canvas id="total_chart" width="400" height="400"></canvas>
+    </div>
+</div>
+{% endif %}
+<script>
+var dynamicColors = function() {
+    var r = Math.floor(Math.random() * 255);
+    var g = Math.floor(Math.random() * 255);
+    var b = Math.floor(Math.random() * 255);
+    return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+var colors = []
+var max = Math.max({{data.channels.label|tojson|safe}}.length,
+{{data.publishing}}.length,
+{{data.users.users|tojson|safe}}.length)
+for (var i = 0; i < max; i++){
+    colors.push(dynamicColors())
+}
+var ctx1 = document.getElementById("channel_chart").getContext('2d');
+var channel_chart = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+        labels: {{data.channels.label|tojson|safe}},
+        datasets: [{
+            label: '# of Votes',
+            backgroundColor: colors,
+            data: {{data.channels.count}},
+            borderWidth: 1
+        }]
+    },
+});
+
+var ctx2 = document.getElementById("publishing_chart").getContext('2d');
+var publishing_chart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        display: false,
+        labels: ['Posts',
+                 'Publications',
+                 'Pending',
+                 'Accepted'],
+        datasets: [{
+            backgroundColor: colors,
+            data: {{data.publishing}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        legend: {
+                display: false,
+        },
+
+    }
+});
+
+var ctx3 = document.getElementById("accepted_chart").getContext('2d');
+var publishing_chart = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+        display: false,
+        labels: {{data.users.users|tojson|safe}},
+        datasets: [{
+            backgroundColor: colors,
+            data: {{data.users.accepted}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        legend: {
+                display: false,
+        },
+
+    }
+});
+
+var ctx4 = document.getElementById("waiting_chart").getContext('2d');
+var waiting_chart = new Chart(ctx4, {
+    type: 'bar',
+    data: {
+        display: false,
+        labels: {{data.users.users|tojson|safe}},
+        datasets: [{
+            backgroundColor: colors,
+            data: {{data.users.waiting}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        legend: {
+                display: false,
+        },
+
+    }
+});
+var ctx5 = document.getElementById("total_chart").getContext('2d');
+var total_chart = new Chart(ctx5, {
+    type: 'bar',
+    data: {
+        display: false,
+        labels: {{data.users.users|tojson|safe}},
+        datasets: [{
+            backgroundColor: colors,
+            data: {{data.users.total}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        legend: {
+                display: false,
+        },
+
+    }
+});
+</script>
+{% endblock %}

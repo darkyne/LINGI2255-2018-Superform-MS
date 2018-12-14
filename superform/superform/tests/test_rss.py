@@ -4,9 +4,14 @@ import json
 from superform.models import Channel, db
 import random
 import os
-#from rss import rss
+import rfeed
+import pytest
+# from rss import rss
 from superform.plugins import rss
 from superform import app, Publishing
+from pathlib import Path
+
+import datetime
 
 
 def test_run_feed_simple():
@@ -19,7 +24,7 @@ def test_run_feed_simple():
     rdescription = "Trying to create a new field"
     # Creating the new field
 
-    feed, nameOfFeed = rss.newFeed(rname, rdescription)
+    feed, nameOfFeed = rss.newFeed(rname, rdescription,debug=True)
     expectedNameOfFeed = rname.replace(" ", "_")
     assert feed, "No new feed was created"
     assert nameOfFeed == expectedNameOfFeed, "The name of the field was modified or wrong : expected {} from {}  but got {}".format(
@@ -41,6 +46,8 @@ def test_run_feed_bad_name():
 
     # TODO : replace ValueError by something more general, we are just expecting an error
 
+    pass
+
 
 # with pytest.raises(ValueError, message="The RSS feed allows us to create a post with no title"):
 #   feed, nameOfFeed = rss.newFeed(rname, rdescription)
@@ -57,6 +64,8 @@ def test_run_feed_bad_description():
 
     # TODO : replace ValueError by something more general, we are just expecting an error
 
+    pass
+
 
 # with pytest.raises(ValueError, message="The RSS feed allows us to create a post with no description"):
 #  feed, nameOfFeed = rss.newFeed(rname, rdescription)
@@ -72,17 +81,30 @@ def test_import_items():
     rdescription = "Trying to create a new field and see if no data was lsot"
     # Creating the new field
 
-    feed, nameOfFeed = rss.newFeed(rname, rdescription)
+    feed, nameOfFeed = rss.newFeed(rname, rdescription,debug=True)
     assert feed.link, "The new feed doesn't have any link , can't test the created content"
-    items = rss.import_items(feed.link)
+    parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    localPath = parent + "\\static\\rss\\" + nameOfFeed + ".xml"
+    item = rfeed.Item(
+        title=rname,
+        link=feed.link,
+        description=rdescription,
+        pubDate=datetime.datetime.now())
+    feed.items.append(item)
+    a = feed.rss()
+    with open(localPath, 'w') as f:
+        f.write(a)
+    items = rss.import_items(localPath)
     found_wanted_feed = False
 
+    print("len item {}".format(len(items)))
     for item in items:
+        print(item.description)
         if item.description == rdescription and item.title == rname.replace(" ", "_"):
             found_wanted_feed = True
             print("The new field was well created")
             return
-    assert found_wanted_feed, "The new rss publishign failled"
+    assert found_wanted_feed, "The new rss feed creation and import failled"
 
 
 def test_publish_base():
@@ -118,9 +140,13 @@ def test_publish_base():
     pub.image_url = 'image url'
     pub.date_until = '14.02.19'
     pub.state = 1
-    pub.channel_id = 0  # TODO : find the good chanel id
     c = db.session.query(Channel).filter(
-        Channel.id == pub.channel_id).first()
+        Channel.module == "rss").first()
+
+    if c is None:
+        print("No Rss Channel found")
+        return
+    pub.channel_id = c.channel_id
     plugin_name = c.module
     c_conf = c.config
     channel_config = None

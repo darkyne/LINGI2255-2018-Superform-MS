@@ -42,13 +42,13 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="datefrompost">Publication Date</label><br>
-                                            <input id="datefrompost" name="datefrompost" type="date" class="form-control">
+                                            <input id="datefrompost" name="datefrompost" type="datetime-local" valueAsDate='document.write(new Date())' class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="dateuntilpost">Publication Until</label><br>
-                                            <input id="dateuntilpost" name="dateuntilpost" type="date" class="form-control">
+                                            <input id="dateuntilpost" name="dateuntilpost" type="datetime-local" class="form-control">
                                         </div>
                                     </div>
                                 </div>
@@ -74,9 +74,7 @@
 
                          <div class="card">
                           <div class="card-header">Status</div>
-
                           <div class="card-body" id="status-content"></div>
-
                          </div>
 
 
@@ -112,15 +110,29 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="{{ chan.name }}_datefrompost">Publication Date</label><br>
-                                            <input id="{{ chan.name }}_datefrompost" name="{{ chan.name }}_datefrompost" type="date" class="form-control">
+                                            <input id="{{ chan.name }}_datefrompost" name="{{ chan.name }}_datefrompost" type="datetime-local" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="{{ chan.name }}_dateuntilpost">Publication Until</label><br>
-                                            <input id="{{ chan.name }}_dateuntilpost" name="{{ chan.name }}_dateuntilpost" type="date" class="form-control">
+                                            <input id="{{ chan.name }}_dateuntilpost" name="{{ chan.name }}_dateuntilpost" type="datetime-local" class="form-control">
                                         </div>
                                     </div>
+                                    <!-- {% if chan.module == "superform.plugins.gcal_plugin" %}
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ chan.name }}_starttime">Start Time</label><br>
+                                            <input id="{{ chan.name }}_starttime" name="{{ chan.name }}_starttime" type="time" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ chan.name }}_endtime">End Time</label><br>
+                                            <input id="{{ chan.name }}_endtime" name="{{ chan.name }}_endtime" type="time" class="form-control">
+                                        </div>
+                                    </div>
+                                    {% endif %} -->
                                 </div>
 
                             </div>
@@ -161,7 +173,7 @@
     {% else %}
         Your are not logged in.
     {% endif %}
-        
+
 
 {% endblock %}
 
@@ -169,7 +181,7 @@
 
     <script src="{{ url_for('static', filename='js/facebook_sdk.js') }}"></script>
     <script>
-        
+
         // This manage if a channel is selected or not:
         //  it hides/shows a tab for a channel
         //  it adds an information bullet to unavailable fields for each channel
@@ -266,7 +278,7 @@
     </script>
 
 
-
+<script src="./static/js/date-init.js"></script>
 <script src="./static/js/status-checker.js"></script>
 
 {% endblock %}

@@ -76,7 +76,12 @@ flask run --cert rootCA.pem --key rootCA.key
 * You're now logged in, you can use facebook login. To log in, create a new post, you'll see one new button on the navbar. If you're already logged in on facebook with your browser but you never used this app, please log out and sign in again.
 
 
-* It's only the beginning, we will automate this process for the next pushes. We are currently working on the ajax branch to get the result of the FB.api() async function. We are not mastering JS yet so it will be done for the next iteration.
+* It's only the beginning, we are fixing the SSL issue with testshib, and we are doing protective programming with tokens and login buttons
+
+
+## GCal plugin:
+In order to run the GCal plugin, you must first create a project on the Google API at the following link: https://console.developers.google.com/, this will give you an Application ID that we will use later. THen, you must create an OAuth Client ID in the credentials tab. This will provide you a client ID and a client secret. Note that you don't need to download the JSON file of the credentials. Lastly, you will need to enable Google Calendar with your project by finding him on the library tab.
+Then you can connect to the Superform application and create a new channel linked to gcal. You will now need to configure it with the 3 different values that you found earlier when registering the Application to the Google API. After that, you just need to set up the configurations for the corresponding gcal channel and you can now post on Google Calendar through Superform.
 
 
 ## Contributors

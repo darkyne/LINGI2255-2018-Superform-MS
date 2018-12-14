@@ -10,6 +10,7 @@ import random
 import string
 import traceback
 import time
+from builtins import *
 from pathlib import Path
 from superform.models import Channel, db
 
@@ -96,7 +97,7 @@ def linkedin_plugin(id, c, config_fields, status):
                 expiration_flag = 1
                 expiration_message += "Token still valid for " + str(
                     days_left) + ' days.'
-                if days_left < 6:
+                if days_left < 11:
                     expiration_flag = 2
                     expiration_message += " We strongly advise you to already " \
                                           "re-link your LinkedIn account and" \

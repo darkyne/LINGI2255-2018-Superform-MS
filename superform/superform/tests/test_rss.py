@@ -1,17 +1,15 @@
 #####  PART 2 OF TESTS, DO NOT REMOVE ######
 
-import json
-from superform.models import Channel, db
-import random
-import os
-import rfeed
-import pytest
-# from rss import rss
-from superform.plugins import rss
-from superform import app, Publishing
-from pathlib import Path
-
 import datetime
+import os
+import random
+from builtins import str, len, open
+
+import rfeed
+
+from superform import Publishing
+from superform.models import Channel, db
+from superform.plugins import rss
 
 
 def test_run_feed_simple():
@@ -24,51 +22,13 @@ def test_run_feed_simple():
     rdescription = "Trying to create a new field"
     # Creating the new field
 
-    feed, nameOfFeed = rss.newFeed(rname, rdescription,debug=True)
+    feed, nameOfFeed = rss.newFeed(rname, rdescription, debug = True)
     expectedNameOfFeed = rname.replace(" ", "_")
     assert feed, "No new feed was created"
     assert nameOfFeed == expectedNameOfFeed, "The name of the field was modified or wrong : expected {} from {}  but got {}".format(
         expectedNameOfFeed, rname, nameOfFeed)
     assert feed.link, "The new feed doesn't have any link"
     assert feed.description == rdescription, "The new feed doesn't have the expected description"
-
-    #   TODO: maybe test the date too ?
-
-
-def test_run_feed_bad_name():
-    """
-        Trying to create a new field with no name, should give an error
-    :return:
-    """
-
-    rname = ""
-    rdescription = "Trying to create a new field with no name"
-
-    # TODO : replace ValueError by something more general, we are just expecting an error
-
-    pass
-
-
-# with pytest.raises(ValueError, message="The RSS feed allows us to create a post with no title"):
-#   feed, nameOfFeed = rss.newFeed(rname, rdescription)
-
-
-def test_run_feed_bad_description():
-    """
-        Trying to create a new field with no name, should give an error
-    :return:
-    """
-
-    rname = "Test feed with no description"
-    rdescription = ""
-
-    # TODO : replace ValueError by something more general, we are just expecting an error
-
-    pass
-
-
-# with pytest.raises(ValueError, message="The RSS feed allows us to create a post with no description"):
-#  feed, nameOfFeed = rss.newFeed(rname, rdescription)
 
 
 def test_import_items():
@@ -81,30 +41,29 @@ def test_import_items():
     rdescription = "Trying to create a new field and see if no data was lsot"
     # Creating the new field
 
-    feed, nameOfFeed = rss.newFeed(rname, rdescription,debug=True)
+    feed, nameOfFeed = rss.newFeed(rname, rdescription, debug = True)
     assert feed.link, "The new feed doesn't have any link , can't test the created content"
     parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     localPath = parent + "\\static\\rss\\" + nameOfFeed + ".xml"
     item = rfeed.Item(
-        title=rname,
-        link=feed.link,
-        description=rdescription,
-        pubDate=datetime.datetime.now())
+        title = rname,
+        link = feed.link,
+        description = rdescription,
+        pubDate = datetime.datetime.now())
     feed.items.append(item)
     a = feed.rss()
     with open(localPath, 'w') as f:
         f.write(a)
     items = rss.import_items(localPath)
-    found_wanted_feed = False
 
     print("len item {}".format(len(items)))
     for item in items:
         print(item.description)
-        if item.description == rdescription and item.title == rname.replace(" ", "_"):
-            found_wanted_feed = True
-            print("The new field was well created")
+        if item.description == rdescription and item.title == rname.replace(
+                " ", "_"):
+            assert True, "The new field was well created"
             return
-    assert found_wanted_feed, "The new rss feed creation and import failled"
+    assert False, "The new rss feed creation and import failed"
 
 
 def test_publish_base():
@@ -128,9 +87,12 @@ def test_publish_base():
     pub.title = 'test-Title'
     pub.link_url = 'a link'
     determinants = ["une", "un", "le", "la", "les", "vos", "nos", "mes", "tes"]
-    nomCommuns = ["chien", "chat", "vache", "cheval", "poney", "cochon", "poule", "coq"]
-    verbes = ["aller", "venir", "courir", "voler", "manger", "mourir", "partir", "skier"]
-    lieux = ["campagne", "montagne", "aeroport", "ecole", "mer", "jardin", "toilette"]
+    nomCommuns = ["chien", "chat", "vache", "cheval", "poney", "cochon",
+                  "poule", "coq"]
+    verbes = ["aller", "venir", "courir", "voler", "manger", "mourir",
+              "partir", "skier"]
+    lieux = ["campagne", "montagne", "aeroport", "ecole", "mer", "jardin",
+             "toilette"]
     testDeterminant = determinants[random.randint(0, 8)]
     testNomCmmun = nomCommuns[random.randint(0, 7)]
     testVerbe = verbes[random.randint(0, 7)]
@@ -153,12 +115,14 @@ def test_publish_base():
 
     rss.run(pub, channel_config)
 
-    localPath = os.path.dirname(__file__) + "/rss/feed_" + str(pub.channel_id) + ".xml"
+    localPath = os.path.dirname(__file__) + "/rss/feed_" + str(
+        pub.channel_id) + ".xml"
     items = rss.import_items(localPath)
     found_wanted_feed = False
 
     for item in items:
-        if item.description == rdescription and item.title == rname.replace(" ", "_"):
+        if item.description == rdescription and item.title == rname.replace(
+                " ", "_"):
             found_wanted_feed = True
             print("The new field was well created")
             return

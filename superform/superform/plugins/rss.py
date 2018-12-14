@@ -4,21 +4,24 @@ date: December 2018
 Plugin for the RSS module
 """
 
-from flask import current_app, request
-import json
-import rfeed
 import datetime
+import json
 import os
-import feedparser
 from pathlib import Path
+
+import feedparser
+import rfeed
+from flask import request
 
 FIELDS_UNAVAILABLE = []
 
-CONFIG_FIELDS = ["Feed title", "Feed description", "URL of original feed (optional)"]
+CONFIG_FIELDS = ["Feed title", "Feed description",
+                 "URL of original feed (optional)"]
 
 
-def newFeed(rname, rdescription, debug=False):
+def newFeed(rname, rdescription, debug = False):
     """
+    :param debug: used to debug (enables some prints)
     :param rname: name for the RSS feed
     :param rdescription: description of the RSS feed
     :return: Will return a new (empty publication) feed with "localhost:5000/rss/NAME_OF_FEED.xml" as link
@@ -33,12 +36,12 @@ def newFeed(rname, rdescription, debug=False):
     else:
         feedLink = Path("superform/static/rss/" + nameOfFeed + ".xml")
     feed = rfeed.Feed(
-        title=rname,
-        link=feedLink,
-        description=rdescription,
-        lastBuildDate=datetime.datetime.now(),
-        docs=None,
-        items=[])
+        title = rname,
+        link = feedLink,
+        description = rdescription,
+        lastBuildDate = datetime.datetime.now(),
+        docs = None,
+        items = [])
     print("Link to the feed: ", feedLink)
     return feed, nameOfFeed
 
@@ -49,9 +52,9 @@ def import_items(xml_path):
     :return: return the list of all previous publication (items) on the feed.
     Since when we publish, we overwrite the xml file, we need the history of the publication to re-write them aswell.
     """
-    items = list()
+    items = []
     d = feedparser.parse(xml_path)
-    print("Parsed xml from ",xml_path,":",d)
+    print("Parsed xml from ", xml_path, ":", d)
     for post in d.entries:
         title = None
         link = None
@@ -74,10 +77,10 @@ def import_items(xml_path):
             # print('date ok')
 
         item = rfeed.Item(
-            title=title,
-            link=link,
-            description=body,
-            pubDate=datetime.datetime.strptime(date, "%a, %d %b %Y %X GMT"))
+            title = title,
+            link = link,
+            description = body,
+            pubDate = datetime.datetime.strptime(date, "%a, %d %b %Y %X GMT"))
         items.append(item)
     return items
 
@@ -89,8 +92,8 @@ def run(publishing, channel_config):
     rname = json_data['Feed title']
     rdescription = json_data['Feed description']
     rbaselineFeed = json_data['URL of original feed (optional)']
-    existingFeed=0
-    if rbaselineFeed != "None" :
+    existingFeed = 0
+    if rbaselineFeed != "None":
         existingFeed = 1
     item_title = publishing.title
     item_body = publishing.description
@@ -100,10 +103,10 @@ def run(publishing, channel_config):
     item_img = publishing.image_url
 
     item = rfeed.Item(
-        title=item_title,
-        link=item_link,
-        description=item_body,
-        pubDate=item_from)
+        title = item_title,
+        link = item_link,
+        description = item_body,
+        pubDate = item_from)
 
     localPath = os.path.dirname(__file__) + "/rss/feed_" + str(
         publishing.channel_id) + ".xml"
@@ -115,7 +118,7 @@ def run(publishing, channel_config):
     if os.path.isfile(localPath):  # import older publishing if any
         olderItems = import_items(localPath)
         feed.items.extend(olderItems)
-    elif existingFeed == 1: #Remote rss feed not yet in our server
+    elif existingFeed == 1:  # Remote rss feed not yet in our server
         olderItems = import_items(rbaselineFeed)
         feed.items.extend(olderItems)
     a = feed.rss()

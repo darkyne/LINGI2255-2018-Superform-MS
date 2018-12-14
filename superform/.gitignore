@@ -10,6 +10,6 @@ credentials.json
 /superform/.cache/*
 /superform/.pytest_cache/*
 .DS_Store
-superform.db
+*.pyc
 /superform/rootCA.pem
 /superform/rootCA.key

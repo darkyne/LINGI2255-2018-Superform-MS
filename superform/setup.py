@@ -18,7 +18,7 @@ setup(
         'facebook-sdk',
         'python-twitter',
         'rfeed',
-        'reportlab'
+        'reportlab', 'pytest'
 
     ],
 )

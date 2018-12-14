@@ -17,19 +17,19 @@ This is an html file used for the pdf module
                                     <label for="{{ field }}">{{ field }}</label><br>
                                     {% if field == 'Format' %}
                                         {% for format in formats %}
-                                        <input type="radio"
-                                               name="format"
-                                               value = "{{ format }}"
-                                               id="{{ format }}"
-                                        > {{ format }} <br/>
+                                            <input type="radio"
+                                                   name="format"
+                                                   value="{{ format }}"
+                                                   id="{{ format }}"
+                                            > {{ format }} <br/>
                                         {% endfor %}
                                     {% else %}
                                         {% for logo in logos %}
-                                        <input type="radio"
-                                               name="logo"
-                                               value="{{ logo }}"
-                                               id="{{ logo }}"
-                                        > {{ logo }} <br/>
+                                            <input type="radio"
+                                                   name="logo"
+                                                   value="{{ logo }}"
+                                                   id="{{ logo }}"
+                                            > {{ logo }} <br/>
                                         {% endfor %}
                                     {% endif %}
                                 </div>

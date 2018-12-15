@@ -13,3 +13,4 @@ credentials.json
 *.pyc
 /superform/rootCA.pem
 /superform/rootCA.key
+*.db

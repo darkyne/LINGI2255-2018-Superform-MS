@@ -39,9 +39,8 @@ def linkedin_plugin(id, c, config_fields, status):
     :return: creates the template
     """
     state = "id_" + str(id) + "rest_" + id_generator()
-    # return_url = 'http://localhost:5000/configure/linkedin' hardcoded url
-    # just in case
     client_id = "no client id"
+    # return_url = 'http://localhost:5000/configure/linkedin' hardcoded url
     return_url = request.url_root + str(url_for('channels.linkedin_return'))[
                                     1:]
 

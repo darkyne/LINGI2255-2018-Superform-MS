@@ -1,9 +1,3 @@
-from flask import Flask, render_template, session
-#For search
-from flask import request, url_for
-import json
-#
-import pkgutil
 import importlib
 import pkgutil
 
@@ -12,16 +6,17 @@ from flask import Flask, render_template, session, request
 import superform.plugins
 from superform.authentication import authentication_page
 from superform.authorizations import authorizations_page
-from superform.stats import stats_page
 from superform.channels import channels_page
 # from OpenSSL import SSL
 from superform.models import db, Authorization, Channel
 from superform.models import db, User, Post, Publishing, Channel
+from superform.plugins import pdf
 from superform.posts import posts_page
-from superform.users import get_moderate_channels_for_user, is_moderator
-from superform.search import search_page
 from superform.publishings import pub_page
 from superform.rss_explorer import rss_explorer_page
+from superform.search import search_page
+from superform.stats import stats_page
+from superform.users import get_moderate_channels_for_user, is_moderator
 from superform.users import get_moderate_channels_for_user, is_moderator, \
     channels_available_for_user
 
@@ -58,8 +53,7 @@ def index():
         if action == "export":
             post_id = request.form.get("id")
             chan_id = request.form.get("template")
-            #print('post_id = %s\nchan_id = %s' %(post_id, chan_id))
-            return plugins.pdf.export(post_id, chan_id)
+            return pdf.export(post_id, chan_id)
     # end addition
 
     user = User.query.get(session.get("user_id", "")) if session.get(
@@ -82,7 +76,8 @@ def index():
             chans)
         flattened_list_pubs = [y for x in pubs_per_chan for y in x]
         # TEAM06: changes in the render_template, templates
-    return render_template("index.html", user = user, posts = posts, channels=chans,
+    return render_template("index.html", user = user, posts = posts,
+                           channels = chans,
                            publishings = flattened_list_pubs,
                            templates = pdf_chans)
 

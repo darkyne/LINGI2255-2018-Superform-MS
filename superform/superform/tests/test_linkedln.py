@@ -2,7 +2,7 @@ import configparser
 import json
 import random
 from pathlib import Path
-
+from flask import request, url_for
 from linkedin import linkedin
 
 from superform import Publishing
@@ -18,7 +18,6 @@ from superform.plugins import LinkedIn
 """
 plugin_path_name = "superform/plugins"
 ini_file_name = "linkedin.ini"
-url_root = "localhost:5000/"  # hardcoded for local tests but should be changed for test in a deployed version
 
 
 def test_run_linkedin():
@@ -79,7 +78,8 @@ def test_run_linkedin():
             client_secret = None
             assert (False), "bad configuration, requires a linkedin.ini file "
 
-        return_url = url_root + "/channels"
+        return_url = request.url_root + str(url_for('channels.linkedin_return'))[
+                                        1:]
         authentication = linkedin.LinkedInAuthentication(
             client_id,
             client_secret,
